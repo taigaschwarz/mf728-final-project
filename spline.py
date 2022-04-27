@@ -37,31 +37,32 @@ class Spline_fitting:
     #     plt.show()
     #     return tck(xx)
 
-    def cubic_spline(self):
+    def cubic_spline(self, show_plot=True):
         """
         Natural cubic spline.
         :return: zero rate curve and instantaneous forward rate curve
         """
         tck = interpolate.CubicSpline(self.t, self.zero_rate, bc_type='natural')
         xx = np.linspace(0, max(self.t), 600)
-        plt.figure(figsize=(12, 6))
-        plt.subplot(1, 2, 1)
-        plt.plot(self.t, self.zero_rate, 'o', xx, tck(xx))
-        plt.xlabel('tenor')
-        plt.ylabel('zero rates')
-        plt.title('zero curve (cubic splines)')
-        plt.grid(True)
-        plt.subplot(1, 2, 2)
-        plt.plot(xx, tck(xx, 1) * xx + tck(xx))
-        plt.xlabel('time')
-        plt.ylabel('f rates')
-        plt.title('instantaneous forward curve (cubic splines)')
-        plt.grid(True)
-        plt.show()
+        if show_plot:
+            plt.figure(figsize=(12, 6))
+            plt.subplot(1, 2, 1)
+            plt.plot(self.t, self.zero_rate, 'o', xx, tck(xx))
+            plt.xlabel('tenor')
+            plt.ylabel('zero rates')
+            plt.title('zero curve (cubic splines)')
+            plt.grid(True)
+            plt.subplot(1, 2, 2)
+            plt.plot(xx, tck(xx, 1) * xx + tck(xx))
+            plt.xlabel('time')
+            plt.ylabel('f rates')
+            plt.title('instantaneous forward curve (cubic splines)')
+            plt.grid(True)
+            plt.show()
         return tck(xx), tck(xx, 1) * xx + tck(xx)
 
 
-    def Bspline(self, knots=np.linspace(-10, 30, 15), degree=3):
+    def Bspline(self, knots=np.linspace(-10, 30, 15), degree=3, show_plot=True):
         """
         :return: zero rate curve and instantaneous forward rate curve
         """
@@ -85,20 +86,22 @@ class Spline_fitting:
 
         spl = interpolate.BSpline(knots, result, degree)
         xx = np.linspace(0, max(self.t), 600)
-        plt.figure(figsize=(12, 6))
-        plt.subplot(1, 2, 1)
-        plt.plot(self.t, self.zero_rate, 'o', xx, spl(xx))
-        plt.xlabel('tenor')
-        plt.ylabel('zero rates')
-        plt.title('zero curve (B-splines)')
-        plt.grid(True)
-        plt.subplot(1, 2, 2)
-        plt.plot(xx, spl(xx, 1) * xx + spl(xx))
-        plt.xlabel('time')
-        plt.ylabel('f rates')
-        plt.title('instantaneous forward curve (B-splines)')
-        plt.grid(True)
-        plt.show()
+
+        if show_plot:
+            plt.figure(figsize=(12, 6))
+            plt.subplot(1, 2, 1)
+            plt.plot(self.t, self.zero_rate, 'o', xx, spl(xx))
+            plt.xlabel('tenor')
+            plt.ylabel('zero rates')
+            plt.title('zero curve (B-splines)')
+            plt.grid(True)
+            plt.subplot(1, 2, 2)
+            plt.plot(xx, spl(xx, 1) * xx + spl(xx))
+            plt.xlabel('time')
+            plt.ylabel('f rates')
+            plt.title('instantaneous forward curve (B-splines)')
+            plt.grid(True)
+            plt.show()
         return spl(xx), spl(xx, 1) * xx + spl(xx)
 
     def get_interpolation(self, points, rate_grid):
@@ -109,7 +112,6 @@ class Spline_fitting:
 if __name__ == "__main__":
 
     data = pd.read_csv('data/zero_rate.csv', index_col=0)/100
-    print(data)
     data.sort_index(inplace=True)
     # print(data)
     tenor = [0.5,1,2,3,4,5,6,7,8,9,10,15,20,30]
@@ -118,8 +120,8 @@ if __name__ == "__main__":
     S = Spline_fitting(tenor, list(data.loc['2022-02']))
 
     # output: zero rate grid and instantaneous forward rate grid
-    zero_rate1, f_rate1 = S.cubic_spline()
-    zero_rate2, f_rate2 = S.Bspline()
+    zero_rate1, f_rate1 = S.cubic_spline(show_plot=False)
+    zero_rate2, f_rate2 = S.Bspline(show_plot=False)
 
     # get interpolation of some time spots we want
     tt = 1.5  # the given maturity
