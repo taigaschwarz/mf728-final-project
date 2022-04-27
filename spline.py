@@ -39,6 +39,7 @@ class Spline_fitting:
 
     def cubic_spline(self):
         """
+        Natural cubic spline.
         :return: zero rate curve and instantaneous forward rate curve
         """
         tck = interpolate.CubicSpline(self.t, self.zero_rate, bc_type='natural')
@@ -107,13 +108,14 @@ class Spline_fitting:
 
 if __name__ == "__main__":
 
-    data = pd.read_csv('/Users/cai/python_program/MF728/data/zero_rate.csv', index_col=0)
+    data = pd.read_csv('data/zero_rate.csv', index_col=0)/100
+    print(data)
     data.sort_index(inplace=True)
     # print(data)
     tenor = [0.5,1,2,3,4,5,6,7,8,9,10,15,20,30]
 
     # create a Spline_fitting object
-    S = Spline_fitting(tenor, list(data.loc['2017-04']))
+    S = Spline_fitting(tenor, list(data.loc['2022-02']))
 
     # output: zero rate grid and instantaneous forward rate grid
     zero_rate1, f_rate1 = S.cubic_spline()

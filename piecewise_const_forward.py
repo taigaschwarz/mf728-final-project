@@ -111,7 +111,7 @@ if __name__=='__main__':
     import matplotlib.pyplot as plt
 
     swap_df = pd.read_csv('data/SOFR_swap.csv')
-    sofr_swaps = np.array(swap_df.iloc[0, :])[3:]/100  # starting at the 1 year swap
+    sofr_swaps = np.array(swap_df.iloc[1, :])[3:]/100  # starting at the 1 year swap
     terms = np.array([1, 2, 3, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30])
     # sofr_swaps = np.array([2.8438, 3.060, 3.126, 3.144, 3.150, 3.169, 3.210, 3.237])/100
     # terms = np.array([1, 2, 3, 4, 5, 7, 10, 30])
