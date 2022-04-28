@@ -29,8 +29,18 @@ if __name__ == '__main__':
     from spline import Spline_fitting
 
     # data
-    SOFR_swaps_df = pd.read_csv('data/SOFR_swap.csv').set_index('Date')
+    # SOFR_swaps_df = pd.read_csv('data/SOFR_swap.csv').set_index('Date')
     zero_rates_df = pd.read_csv('data/zero_rate.csv', index_col=0)/100
+
+    ############ test for positive forward rates ############
+
+    ### spline methods
+    test_zero_rates = np.array([0.08, 0.07, 0.08, 0.07, 0.08, 0.07])
+    test_terms = np.array([0.5, 5, 10, 15, 20, 30])
+    S_test = Spline_fitting(test_terms, test_zero_rates)
+    r_test_cs, f_rates_cs = S_test.cubic_spline(show_plot=True)
+    r_test_bs, f_rates_bs = S_test.Bspline(show_plot=True)
+
 
     # ############ test localness of the interpolation method ############
 
@@ -247,7 +257,7 @@ if __name__ == '__main__':
     plt.ylabel('f rates')
     plt.title('instantaneous forward curve')
     plt.grid(True)
-    plt.ylim((0, 0.04))
+    plt.ylim((0, 0.045))
     plt.legend()
     plt.suptitle('Change in yield curve over 03/2022 ~ 11/2021 (piecewise constant forwards)')
     plt.show()
@@ -287,7 +297,7 @@ if __name__ == '__main__':
     plt.ylabel('f rates')
     plt.title('instantaneous forward curve')
     plt.grid(True)
-    plt.ylim((0, 0.04))
+    plt.ylim((0, 0.045))
     plt.legend()
     plt.suptitle('Change in yield curve over 03/2022 ~ 11/2021 (natural cubic spline)')
     plt.show()
@@ -327,10 +337,50 @@ if __name__ == '__main__':
     plt.ylabel('f rates')
     plt.title('instantaneous forward curve')
     plt.grid(True)
-    plt.ylim((0, 0.04))
+    plt.ylim((0, 0.045))
     plt.legend()
     plt.suptitle('Change in yield curve over 03/2022 ~ 11/2021 (cubic B-spline)')
     plt.show()
+
+    ### monotone convex method (Hagan-West)
+    # zero_rates4_stab = []
+    # f_rates4_stab = []
+    # for i in range(len(zero_rates_ts)):
+    #     M = Monotone_convex(terms, zero_rates_ts[i])
+    #     r, f = M.fitting()
+    #     zero_rates4_stab.append(r)
+    #     f_rates4_stab.append(f)
+
+    # # stability ratio
+    # M = Monotone_convex(terms, zero_rates)
+    # f_stability_ratio, z_stability_ratio = M.stability_ratio()
+    # print("monotone convex stability:")
+    # print("f(t) stability ratio: ", f_stability_ratio)
+    # print("r(t) stability ratio: ", z_stability_ratio)
+    #
+    # # visualize
+    # xx = np.linspace(0, max(terms), 600)
+    # plt.figure(figsize=(12, 6))
+    # plt.subplot(1, 2, 1)
+    # for i in range(len(zero_rates_ts)):
+    #     plt.plot(xx, zero_rates4_stab[i], label=f'{dates[i]}')
+    # plt.xlabel('time')
+    # plt.ylabel('zero rates')
+    # plt.title('zero curve')
+    # plt.grid(True)
+    # plt.ylim((0, 0.03))
+    # plt.legend()
+    # plt.subplot(1, 2, 2)
+    # for i in range(len(f_rates4_stab)):
+    #     plt.plot(xx, f_rates4_stab[i], label=f'{dates[i]}')
+    # plt.xlabel('time')
+    # plt.ylabel('f rates')
+    # plt.title('instantaneous forward curve')
+    # plt.grid(True)
+    # plt.ylim((0, 0.04))
+    # plt.legend()
+    # plt.suptitle('Change in yield curve over 03/2022 ~ 11/2021 (monotone convex)')
+    # plt.show()
 
 
 

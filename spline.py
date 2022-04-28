@@ -157,8 +157,8 @@ class Spline_fitting:
             z_ratios.append(max(z_after - z_before) / d_input)
 
         # compute mean of the ratios
-        f_ratio = np.mean(np.array(f_ratios))
-        z_ratio = np.mean(np.array(z_ratios))
+        f_ratio = round(np.mean(np.array(f_ratios)), 4)
+        z_ratio = round(np.mean(np.array(z_ratios)), 4)
 
         return f_ratio, z_ratio
 

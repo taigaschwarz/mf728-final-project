@@ -106,7 +106,34 @@ class Monotone_convex:
         for i in xx:
             zero_curve.append(quad(func, 0, i)[0] / i)
             instantaneous_curve.append(self.construct_g_func(i))
-        return zero_curve, instantaneous_curve
+        return np.array(zero_curve), np.array(instantaneous_curve)
+
+    def stability_ratio(self):
+
+        import numpy as np
+
+        # curves before shift
+        f_before, z_before = self.fitting()
+
+        # curves after shift
+        f_ratios = []
+        z_ratios = []
+        d_input = 1 / 10000  # parallel shift of 1 bp
+        for i in range(len(self.t)):
+            zero_rates_i = self.zero_rate
+            zero_rates_i[i] += d_input
+            PCF_after = Monotone_convex(self.t, zero_rates_i)
+            f_after, z_after = PCF_after.fitting()
+
+            # compute stability ratios
+            f_ratios.append(max(f_after - f_before) / d_input)
+            z_ratios.append(max(z_after - z_before) / d_input)
+
+        # compute mean of the ratios
+        f_ratio = round(np.mean(np.array(f_ratios)), 4)
+        z_ratio = round(np.mean(np.array(z_ratios)), 4)
+
+        return f_ratio, z_ratio
 
 if __name__ == "__main__":
 
