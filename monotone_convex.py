@@ -5,7 +5,6 @@ Date: 2022-04-26
 """
 import numpy as np
 import pandas as pd
-from scipy.integrate import quad
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
@@ -47,6 +46,7 @@ class Monotone_convex:
         return re
 
     def construct_g_func(self, time):
+        global g0, g1, x, idx
         fd_grid = self.find_discrete_forward_rates()
         f_grid = self.find_f_rate_nodes()
         time_grid = np.append([0], self.t)
@@ -96,6 +96,9 @@ class Monotone_convex:
         """
         :return: zero curve and instantaneous f curve
         """
+
+        from scipy.integrate import quad
+
         xx = np.linspace(0, max(self.t), 600)
         func = lambda x: self.construct_g_func(x)
         zero_curve = []
@@ -109,7 +112,7 @@ if __name__ == "__main__":
 
     data = pd.read_csv('data/zero_rate.csv', index_col=0)
     data.sort_index(inplace=True)
-    zero_rate = list(data.loc['2022-03'])
+    zero_rate = list(data.loc['2020-10'])
     tenor = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
 
     M = Monotone_convex(tenor, zero_rate)
