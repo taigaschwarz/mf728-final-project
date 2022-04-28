@@ -107,9 +107,9 @@ class Monotone_convex:
 
 if __name__ == "__main__":
 
-    data = pd.read_csv('/Users/cai/python_program/MF728/data/zero_rate.csv', index_col=0)
+    data = pd.read_csv('data/zero_rate.csv', index_col=0)
     data.sort_index(inplace=True)
-    zero_rate = list(data.loc['2017-04'])
+    zero_rate = list(data.loc['2022-03'])
     tenor = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
 
     M = Monotone_convex(tenor, zero_rate)
