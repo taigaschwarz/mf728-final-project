@@ -142,6 +142,33 @@ class Raw_interpolation:
         zero_curve = np.insert(zero_curve, 0, zero_curve[0])
         return dforwards, zero_curve
 
+    def stability_ratio(self):
+
+        import numpy as np
+
+        # curves before shift
+        f_before, z_before = self.raw_interpolation()
+
+        # curves after shift
+        f_ratios = []
+        z_ratios = []
+        d_input = 1 / 10000  # parallel shift of 1 bp
+        for i in range(len(self.terms)):
+            zero_rates_i = self.zero_rates
+            zero_rates_i[i] += d_input
+            PCF_after = Raw_interpolation(self.terms, zero_rates_i)
+            f_after, z_after = PCF_after.raw_interpolation()
+
+            # compute stability ratios
+            f_ratios.append(max(f_after - f_before) / d_input)
+            z_ratios.append(max(z_after - z_before) / d_input)
+
+        # compute mean of the ratios
+        f_ratio = round(np.mean(np.array(f_ratios)), 4)
+        z_ratio = round(np.mean(np.array(z_ratios)), 4)
+        return f_ratio, z_ratio
+
+
 
 if __name__=='__main__':
 

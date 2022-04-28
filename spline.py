@@ -37,7 +37,7 @@ class Spline_fitting:
     #     plt.show()
     #     return tck(xx)
 
-    def cubic_spline(self, show_plot=True):
+    def cubic_spline(self, show_plot=False):
         """
         Natural cubic spline.
         :return: zero rate curve and instantaneous forward rate curve
@@ -62,7 +62,7 @@ class Spline_fitting:
         return tck(xx), tck(xx, 1) * xx + tck(xx)
 
 
-    def Bspline(self, knots=np.linspace(-10, 30, 15), degree=3, show_plot=True):
+    def Bspline(self, knots=np.linspace(-10, 30, 15), degree=3, show_plot=False):
         """
         :return: zero rate curve and instantaneous forward rate curve
         """
@@ -107,6 +107,60 @@ class Spline_fitting:
     def get_interpolation(self, points, rate_grid):
         re = np.interp(points, np.linspace(0, max(self.t), 600), rate_grid)
         return re
+
+    def cubic_stability_ratio(self):
+
+        import numpy as np
+
+        # curves before shift
+        f_before, z_before = self.cubic_spline()
+
+        # curves after shift
+        f_ratios = []
+        z_ratios = []
+        d_input = 1 / 10000  # parallel shift of 1 bp
+        for i in range(len(self.t)):
+            zero_rates_i = self.zero_rate
+            zero_rates_i[i] += d_input
+            PCF_after = Spline_fitting(self.t, zero_rates_i)
+            f_after, z_after = PCF_after.cubic_spline()
+
+            # compute stability ratios
+            f_ratios.append(max(f_after - f_before) / d_input)
+            z_ratios.append(max(z_after - z_before) / d_input)
+
+        # compute mean of the ratios
+        f_ratio = round(np.mean(np.array(f_ratios)), 4)
+        z_ratio = round(np.mean(np.array(z_ratios)), 4)
+
+        return f_ratio, z_ratio
+
+    def Bspline_stability_ratio(self):
+
+        import numpy as np
+
+        # curves before shift
+        f_before, z_before = self.Bspline()
+
+        # curves after shift
+        f_ratios = []
+        z_ratios = []
+        d_input = 1 / 10000  # parallel shift of 1 bp
+        for i in range(len(self.t)):
+            zero_rates_i = self.zero_rate
+            zero_rates_i[i] += d_input
+            PCF_after = Spline_fitting(self.t, zero_rates_i)
+            f_after, z_after = PCF_after.Bspline()
+
+            # compute stability ratios
+            f_ratios.append(max(f_after - f_before) / d_input)
+            z_ratios.append(max(z_after - z_before) / d_input)
+
+        # compute mean of the ratios
+        f_ratio = np.mean(np.array(f_ratios))
+        z_ratio = np.mean(np.array(z_ratios))
+
+        return f_ratio, z_ratio
 
 
 if __name__ == "__main__":
