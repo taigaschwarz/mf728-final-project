@@ -135,12 +135,16 @@ class Raw_interpolation:
             dforwards[i-1] = f
             rt[i] = r[i]*t[i]
         dforwards = np.insert(dforwards, 0, dforwards[0])
+
         # linearly interpolate
         rt_func = interp1d(t, rt)
+        f_func = interp1d(t, dforwards)
         xx = np.linspace(0, max(t), 600)
         zero_curve = rt_func(xx[1:])/xx[1:]
+        f_curve = f_func(xx[1:])
+        f_curve = np.insert(f_curve, 0, f_curve[0])
         zero_curve = np.insert(zero_curve, 0, zero_curve[0])
-        return dforwards, zero_curve
+        return f_curve, zero_curve
 
     def stability_ratio(self):
 
@@ -167,6 +171,67 @@ class Raw_interpolation:
         f_ratio = round(np.mean(np.array(f_ratios)), 4)
         z_ratio = round(np.mean(np.array(z_ratios)), 4)
         return f_ratio, z_ratio
+
+    def get_interpolation(self, points, rate_grid):
+
+        import numpy as np
+        re = np.interp(points, np.linspace(0, max(self.terms), 600), rate_grid)
+        return re
+
+    def raw_forward(self, s, t, d=0.5):
+        """Computes the forward rate between time s and t (as valued at time 0) using cubic spline interpolation.
+        @param s: time to where the forward rate is used to discount to (s < t)
+        @param t: time from which the forward rate is used to discount from
+        @param d: day count factor for the period [s,t]
+        """
+
+        import numpy as np
+        import scipy.integrate as integrate
+
+        # compute instantaneous forward curve
+        S = Raw_interpolation(self.terms, self.zero_rates)
+        f_curve, zero_curve = S.raw_interpolation()
+
+        # discretize the time space and forward curve between time s and t
+        t_vec = np.linspace(s, t, 500)
+        f_vec = self.get_interpolation(t_vec, f_curve)
+
+        # integrate the forward curve between s and t
+        integral = integrate.simpson(f_vec, t_vec)
+
+        # compute the forward rate
+        forward_rate = (1 / d) * (np.exp(integral) - 1)
+
+        return forward_rate
+
+    def raw_swap_price(self, T, d=0.5, a=0.5):
+        """Computes the break-even fixed/float swap price given an array of forward rates and discount rates for each
+        payment. Default is semi-annual payments for both fixed and floating legs."""
+
+        import numpy as np
+
+        # payment periods for float and fixed leg
+        t_vec_float = np.arange(0, T + d, d)
+        t_vec_fixed = np.arange(0, T + a, a)
+
+        # compute forward rates and discount factors for the float payments
+        F_rates = np.zeros(len(t_vec_float) - 1)
+        for i in range(1, len(t_vec_float)):
+            F_rates[i-1] = self.raw_forward(t_vec_float[i-1], t_vec_float[i], d)
+
+        # compute the discount factors for the fixed and float payments
+        zero_curve = self.raw_interpolation()[1]
+        r_fixed = self.get_interpolation(t_vec_fixed[1:], zero_curve)
+        r_float = self.get_interpolation(t_vec_float[1:], zero_curve)
+        df_fixed = np.exp(-(r_fixed * t_vec_fixed[1:]))
+        df_float = np.exp(-(r_float * t_vec_float[1:]))
+
+        # compute breakeven swap price
+        pv_float = np.sum(d * F_rates * df_float)  # PV of the floating leg
+        annuity = np.sum(a * df_fixed)
+        swap_price = pv_float / annuity
+
+        return swap_price
 
 
 
@@ -202,11 +267,11 @@ if __name__=='__main__':
     # plt.show()
 
     zero_rates_df = pd.read_csv('data/zero_rate.csv', index_col=0)/100
-    zero_rates = np.array(zero_rates_df.loc['2020-02'])
+    zero_rates = np.array(zero_rates_df.loc['2022-03'])
     terms = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
 
     PCF = Raw_interpolation(terms, zero_rates)
-    dforwards, zero_curve = PCF.raw_interpolation()
+    f_curve, zero_curve = PCF.raw_interpolation()
 
     xx = np.linspace(0, max(terms), 600)
     terms = np.insert(terms, 0, 0)
@@ -218,13 +283,14 @@ if __name__=='__main__':
     plt.title('zero curve (piecewise constant forwards)')
     plt.grid(True)
     plt.subplot(1, 2, 2)
-    plt.plot(terms, dforwards)
+    plt.plot(xx, f_curve)
     plt.xlabel('time')
     plt.ylabel('f rates')
     plt.title('instantaneous forward curve (piecewise constant forwards)')
     plt.grid(True)
     plt.show()
 
+    print(PCF.raw_swap_price(4))
 
 
 

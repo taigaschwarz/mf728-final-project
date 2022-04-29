@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     # actual zero curve and forward curve
     PCF = Raw_interpolation(terms, zero_rates)
-    f_rates1, r_rates1 = PCF.raw_interpolation()
+    f_curve1, zero_curve1 = PCF.raw_interpolation()
     # r_rates1, f_rates1 = piecewise_const_fwd(swaps, terms, 0.5, 0.5)
 
     # bump the inputs
@@ -77,15 +77,15 @@ if __name__ == '__main__':
         plt.figure(figsize=(12, 6))
         plt.subplot(1, 2, 1)
         plt.plot(xx, r_bumps1[i], 'orange', label='w/ bump')
-        plt.plot(xx, r_rates1, 'blue', label='w/out bump')
+        plt.plot(xx, zero_curve1, 'blue', label='w/out bump')
         plt.xlabel('time')
         plt.ylabel('zero rates')
         plt.title('zero curve')
         plt.grid(True)
         plt.legend()
         plt.subplot(1, 2, 2)
-        plt.plot(tenors, f_bumps1[i], 'orange', label='w/ bump')
-        plt.plot(tenors, f_rates1, 'blue', label='w/out bump')
+        plt.plot(xx, f_bumps1[i], 'orange', label='w/ bump')
+        plt.plot(xx, f_curve1, 'blue', label='w/out bump')
         plt.xlabel('time')
         plt.ylabel('f rates')
         plt.title('instantaneous forward curve')
