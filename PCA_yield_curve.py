@@ -53,40 +53,12 @@ scores, evals, evecs = PCA(swap_df, 7)
 #PC(2) Changes in short/long rates (i.e. steepening/flattening of the curve)
 #PC(3) Changes in curvature of the model (twists)
 evecs = pd.DataFrame(evecs)
-plt.plot(evecs.iloc[:, 0:2])
+plt.plot(evecs.iloc[:, 0:3])
 plt.show()
 
 
-#reconstruct the initial dataset 
-reconst = pd.DataFrame(np.dot(scores,evecs.T), index=swap_df.index, columns=swap_df.columns)
-
-plt.plot(reconst)
-plt.ylabel("Rate")
-plt.title("Reconstructed Mean-Subtracted Dataset")
-plt.show()
 
 
-for cols in reconst.columns:
-    reconst[cols] = reconst[cols] + swap_df2.mean(axis=0)[cols]
-    
-plt.plot(reconst)
-plt.xlabel("Rate")
-plt.title("Reconstructed Initial Dataset")
-plt.show()
-
-
-#plot initial component score with the swaps
-scores = pd.DataFrame(np.dot(evecs.T, swap_df.T).T, index=swap_df.index, columns=swap_df.columns)
-scores.plot()
-plt.ylabel("Principal Component Scores")
-plt.show()
-
-
-#PCA and variance
-plt.plot(evals)
-plt.ylabel("Contribution to Variance")
-plt.xlabel("Principal Component")
-plt.show()
 
 
 
