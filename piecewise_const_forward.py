@@ -267,7 +267,7 @@ if __name__=='__main__':
     # plt.show()
 
     zero_rates_df = pd.read_csv('data/zero_rate.csv', index_col=0)/100
-    zero_rates = np.array(zero_rates_df.loc['2022-03'])
+    zero_rates = np.array(zero_rates_df.loc['2020-03'])
     terms = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
 
     PCF = Raw_interpolation(terms, zero_rates)

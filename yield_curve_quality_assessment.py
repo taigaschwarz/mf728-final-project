@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     # ############ test localness of the interpolation method ############
 
-    yr_month = '2022-03'
+    yr_month = '2020-03'
     zero_rates = np.array(zero_rates_df.loc[yr_month])
     terms = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     # r_rates1, f_rates1 = piecewise_const_fwd(swaps, terms, 0.5, 0.5)
 
     # bump the inputs
-    bps = 5
+    bps = 1
     bumped_zero_rates = bumps(zero_rates, bps)
     r_bumps1 = []
     f_bumps1 = []
@@ -253,7 +253,7 @@ if __name__ == '__main__':
     plt.legend()
     plt.subplot(1, 2, 2)
     for i in range(len(zero_rates_ts)):
-        plt.plot(tenors, f_rates1_stab[i], label=f'{dates[i]}')
+        plt.plot(xx, f_rates1_stab[i], label=f'{dates[i]}')
     plt.xlabel('time')
     plt.ylabel('f rates')
     plt.title('instantaneous forward curve')

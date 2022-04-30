@@ -43,7 +43,7 @@ zero_rates = np.array(zero_rates_df.loc['2020-03'])
 terms = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
 
 ### global variables
-t = 6.5  # the tenor of the swap we are hedging
+t = 13  # the tenor of the swap we are hedging
 F = 1  # notional
 
 ### bump the inputs

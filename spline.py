@@ -282,26 +282,16 @@ if __name__ == "__main__":
     tenor = [0.5,1,2,3,4,5,6,7,8,9,10,15,20,30]
 
     # create a Spline_fitting object
-    S = Spline_fitting(tenor, list(data.loc['2022-02']))
+    S = Spline_fitting(tenor, list(data.loc['2020-03']))
 
     # output: zero rate grid and instantaneous forward rate grid
-    zero_rate1, f_rate1 = S.cubic_spline(show_plot=False)
-    zero_rate2, f_rate2 = S.Bspline(show_plot=False)
+    zero_rate1, f_rate1 = S.cubic_spline(show_plot=True)
+    zero_rate2, f_rate2 = S.Bspline(show_plot=True)
 
     # get interpolation of some time spots we want
     tt = 1.5  # the given maturity
     print(S.get_interpolation(tt, f_rate1))  # get zero rate for this point
 
-
-    # fig, ax = plt.subplots()
-    # for i in data.columns:
-    #     S = Spline_fitting(tenor, data[i])
-    #     zero, forward = S.cubic_spline()
-    #     ax.plot(S.t, S.zero_rate, 'o', np.linspace(0, max(S.t), 600), zero)
-    #     # ax.text(1, 1, 'Time={}s'.format(i / 100))
-    #     plt.pause(1e-2)
-    #     ax.cla()
-    # plt.show()
 
 
 
