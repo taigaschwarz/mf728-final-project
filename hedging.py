@@ -39,11 +39,11 @@ def ZCB_price(r, t, F):
 # data
 zero_rates_df = pd.read_csv('data/zero_rate.csv', index_col=0)/100
 dates = zero_rates_df.columns
-zero_rates = np.array(zero_rates_df.loc['2022-03'])
+zero_rates = np.array(zero_rates_df.loc['2020-03'])
 terms = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
 
 ### global variables
-t = 5  # the tenor of the swap we are hedging
+t = 6.5  # the tenor of the swap we are hedging
 F = 1  # notional
 
 ### bump the inputs
@@ -85,6 +85,7 @@ swap_prices1 = np.array(swap_prices1)
 # difference between the new and old price -- vector dV
 swap_price_og = np.repeat(swap_price1, len(zero_rates))
 dV1 = swap_prices1 - swap_price_og
+print("dV1: ", dV1)
 
 # solve PQ = dV for the hedge vector Q
 Q1 = inv(P) @ dV1
