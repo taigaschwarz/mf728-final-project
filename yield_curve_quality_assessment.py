@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     # ############ test localness of the interpolation method ############
 
-    yr_month = '2020-03'
+    yr_month = '2022-03'
     zero_rates = np.array(zero_rates_df.loc[yr_month])
     terms = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     # r_rates1, f_rates1 = piecewise_const_fwd(swaps, terms, 0.5, 0.5)
 
     # bump the inputs
-    bps = 1
+    bps = 5
     bumped_zero_rates = bumps(zero_rates, bps)
     r_bumps1 = []
     f_bumps1 = []
@@ -260,7 +260,7 @@ if __name__ == '__main__':
     plt.grid(True)
     plt.ylim((0, 0.045))
     plt.legend()
-    plt.suptitle('Change in yield curve over 03/2022 ~ 11/2021 (piecewise constant forwards)')
+    plt.suptitle('Change in yield curve over 11/2021 ~ 03/2022 (piecewise constant forwards)')
     plt.show()
 
     ### natural cubic spline
@@ -300,7 +300,7 @@ if __name__ == '__main__':
     plt.grid(True)
     plt.ylim((0, 0.045))
     plt.legend()
-    plt.suptitle('Change in yield curve over 03/2022 ~ 11/2021 (natural cubic spline)')
+    plt.suptitle('Change in yield curve over 11/2021 ~ 03/2022 (natural cubic spline)')
     plt.show()
 
     ### cubic B-spline
@@ -340,7 +340,7 @@ if __name__ == '__main__':
     plt.grid(True)
     plt.ylim((0, 0.045))
     plt.legend()
-    plt.suptitle('Change in yield curve over 03/2022 ~ 11/2021 (cubic B-spline)')
+    plt.suptitle('Change in yield curve over 11/2021 ~ 03/2022 (cubic B-spline)')
     plt.show()
 
     ### monotone convex method (Hagan-West)
