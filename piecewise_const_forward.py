@@ -179,7 +179,7 @@ class Raw_interpolation:
         return re
 
     def raw_forward(self, s, t, d=0.5):
-        """Computes the forward rate between time s and t (as valued at time 0) using cubic spline interpolation.
+        """Computes the forward rate between time s and t (as valued at time 0).
         @param s: time to where the forward rate is used to discount to (s < t)
         @param t: time from which the forward rate is used to discount from
         @param d: day count factor for the period [s,t]
@@ -267,7 +267,7 @@ if __name__=='__main__':
     # plt.show()
 
     zero_rates_df = pd.read_csv('data/zero_rate.csv', index_col=0)/100
-    zero_rates = np.array(zero_rates_df.loc['2020-03'])
+    zero_rates = np.array(zero_rates_df.loc['2022-03'])
     terms = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
 
     PCF = Raw_interpolation(terms, zero_rates)

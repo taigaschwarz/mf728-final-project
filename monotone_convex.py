@@ -135,6 +135,68 @@ class Monotone_convex:
 
         return f_ratio, z_ratio
 
+    def get_interpolation(self, points, rate_grid):
+
+        import numpy as np
+        re = np.interp(points, np.linspace(0, max(self.t), 600), rate_grid)
+        return re
+
+    def monotone_convex_forward(self, s, t, d=0.5):
+        """Computes the forward rate between time s and t (as valued at time 0) using monotone convex interpolation.
+        @param s: time to where the forward rate is used to discount to (s < t)
+        @param t: time from which the forward rate is used to discount from
+        @param d: day count factor for the period [s,t]
+        """
+
+        import numpy as np
+        import scipy.integrate as integrate
+
+        # compute instantaneous forward curve
+        zero_curve, f_curve = self.fitting()
+
+        # discretize the time space and forward curve between time s and t
+        t_vec = np.linspace(s, t, 500)
+        f_vec = self.get_interpolation(t_vec, f_curve)
+
+        # integrate the forward curve between s and t
+        integral = integrate.simpson(f_vec, t_vec)
+
+        # compute the forward rate
+        forward_rate = (1 / d) * (np.exp(integral) - 1)
+
+        return forward_rate
+
+    def mc_swap_price(self, T, d=0.5, a=0.5):
+        """Computes the break-even fixed/float swap price given an array of forward rates and discount rates for each
+        payment. Default is semi-annual payments for both fixed and floating legs."""
+
+        import numpy as np
+
+        # payment periods for float and fixed leg
+        t_vec_float = np.arange(0, T + d, d)
+        t_vec_fixed = np.arange(0, T + a, a)
+
+        # compute forward rates and discount factors for the float payments
+        F_rates = np.zeros(len(t_vec_float) - 1)
+        for i in range(1, len(t_vec_float)):
+            F_rates[i-1] = self.monotone_convex_forward(t_vec_float[i-1], t_vec_float[i], d)
+
+        # compute the discount factors for the fixed and float payments
+        zero_curve = self.fitting()[0]
+        r_fixed = self.get_interpolation(t_vec_fixed[1:], zero_curve)
+        r_float = self.get_interpolation(t_vec_float[1:], zero_curve)
+        df_fixed = np.exp(-(r_fixed * t_vec_fixed[1:]))
+        df_float = np.exp(-(r_float * t_vec_float[1:]))
+
+        # compute breakeven swap price
+        pv_float = np.sum(d * F_rates * df_float)  # PV of the floating leg
+        annuity = np.sum(a * df_fixed)
+        swap_price = pv_float / annuity
+
+        return swap_price
+
+
+
 if __name__ == "__main__":
 
     data = pd.read_csv('data/zero_rate.csv', index_col=0)

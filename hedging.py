@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import inv
 import pandas as pd
+from monotone_convex import Monotone_convex
 from piecewise_const_forward import Raw_interpolation
 from spline import Spline_fitting
 
@@ -39,11 +40,11 @@ def ZCB_price(r, t, F):
 # data
 zero_rates_df = pd.read_csv('data/zero_rate.csv', index_col=0)/100
 dates = zero_rates_df.columns
-zero_rates = np.array(zero_rates_df.loc['2020-03'])
-terms = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30]
+zero_rates = np.array(zero_rates_df.loc['2018-03'])
+terms = np.array([0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30])
 
 ### global variables
-t = 13  # the tenor of the swap we are hedging
+t = 4.5  # the tenor of the swap we are hedging
 F = 1  # notional
 
 ### bump the inputs
@@ -89,6 +90,7 @@ print("dV1: ", dV1)
 
 # solve PQ = dV for the hedge vector Q
 Q1 = inv(P) @ dV1
+print('Q1: ', Q1)
 
 # plot
 asset_num = np.arange(1, len(zero_rates) + 1)
@@ -175,6 +177,44 @@ plt.ylabel("Notional Amount")
 plt.xticks(asset_num, dates)
 plt.title(f"Hedging Portfolio for a {t}Y Swap (Cubic B-Spline)")
 plt.show()
+
+# ### monotone convex interpolation method
+#
+# # actual zero curve and forward curve
+# M = Monotone_convex(terms, zero_rates)
+# zero_curve4, f_curve4 = M.fitting()
+# swap_price4 = M.mc_swap_price(t) * F  # F is the notional
+#
+# # curves constructed from the bumped inputs
+# r_bumps4 = []
+# f_bumps4 = []
+# swap_prices4 = []
+# for i in range(len(zero_rates)):
+#     M = Monotone_convex(terms, bumped_zero_rates[i])
+#     r_rates, f_rates = M.fitting()
+#     swap_price = M.mc_swap_price(t) * F
+#     r_bumps4.append(r_rates)
+#     f_bumps4.append(f_rates)
+#     swap_prices4.append(swap_price)
+# r_bumps4 = np.array(r_bumps4)
+# f_bumps4 = np.array(f_bumps4)
+# swap_prices4 = np.array(swap_prices4)
+#
+# # difference between the new and old price -- vector dV
+# swap_price_og = np.repeat(swap_price4, len(zero_rates))
+# dV4 = swap_prices4 - swap_price_og
+#
+# # solve PQ = dV for the hedge vector Q
+# Q4 = inv(P) @ dV4
+#
+# # plot
+# asset_num = np.arange(1, len(zero_rates) + 1)
+# plt.bar(asset_num, Q4.flatten())
+# plt.xlabel("Maturity")
+# plt.ylabel("Notional Amount")
+# plt.xticks(asset_num, dates)
+# plt.title(f"Hedging Portfolio for a {t}Y Swap (Monotone Convex)")
+# plt.show()
 
 
 

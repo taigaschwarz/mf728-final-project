@@ -173,8 +173,7 @@ class Spline_fitting:
         import scipy.integrate as integrate
 
         # compute instantaneous forward curve
-        S = Spline_fitting(self.t, self.zero_rate)
-        zero_curve, f_curve = S.cubic_spline()
+        zero_curve, f_curve = self.cubic_spline()
 
         # discretize the time space and forward curve between time s and t
         t_vec = np.linspace(s, t, 500)
@@ -199,8 +198,7 @@ class Spline_fitting:
         import scipy.integrate as integrate
 
         # compute instantaneous forward curve
-        S = Spline_fitting(self.t, self.zero_rate)
-        zero_curve, f_curve = S.Bspline()
+        zero_curve, f_curve = self.Bspline()
 
         # discretize the time space and forward curve between time s and t
         t_vec = np.linspace(s, t, 500)
